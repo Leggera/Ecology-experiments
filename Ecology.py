@@ -93,7 +93,7 @@ class Manager:
                 self.Town.add_pollution(pollution)
                 self.Town.penalty_company(company)
                 if (random.randint(0, 1)):                    
-                    money = 100
+                    money = 50
                     if (self.Town.get_money_from_fund(money)):
                         company.add_filter()
                         print "add filter"
