@@ -91,14 +91,15 @@ class Application(Tk.Frame):
         if (n1 == '') or (n2 == '') or (n3 == '') or (n4 == ''):
             self.labelVariable.set("You need to enter every value")
             return
-        self.manager = Manager(int(n1), int(n2), int(n3))
+        self.manager = Manager(int(n1), int(n2), int(n3))#TODO
         for i in range(25):
             
             Control = Control_data(self)
             self.master.wait_window(Control.top)
             self.manager.main()
             if (i == 0):
-                im = self.ax.imshow(f(self.x, self.y, self.manager.Town.Companies, self.manager.Town.Pollution), cmap='YlOrRd', vmin = 25000, vmax = 500000, animated=False)#TODO
+                man = self.manager
+                im = self.ax.imshow(f(self.x, self.y, man.Town.Companies, man.Town.Cars.made_pollution - man.Weather), cmap='YlOrRd', vmin = 25000, vmax = 500000, animated=False)
                 for company in self.manager.Town.Companies:
                     x, y = company.location
                     size = company.size
@@ -111,7 +112,7 @@ class Application(Tk.Frame):
                         fill=False
                     ))
             else:
-                im.set_array(f(self.x, self.y, self.manager.Town.Companies, self.manager.Town.Pollution))
+                im.set_array(f(self.x, self.y, self.manager.Town.Companies, self.manager.Town.Cars.made_pollution - man.Weather))
             
             self.canvas.draw()
             

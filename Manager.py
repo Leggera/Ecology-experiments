@@ -24,25 +24,25 @@ class Manager:
         
         if (self.smth["spec.mode"]):
             self.Town.reduce_cars(float(self.smth["spec.mode"]))
-        self.Town.add_car_pollution()
+        car_pollution = self.Town.Cars.pollute()
+        self.Town.add_pollution(car_pollution)
         print self.Town.measure_pollution()
         for company in self.Town.Companies:
             #print company.name
             #print company.filters
             if (int(self.smth[company.name+"stop working"]) >= 1):
-                print "stop"
                 company.stop_working()
             else:
                 company.resume_working()
             if (company.is_working):
                 self.Town.penalty_company(company)
             if (int(self.smth[company.name+"filters"])>=1):                    
-                money = 250
+                money = 250#TODO
                 if (self.Town.get_money_from_fund(money)):
                     company.add_filter()
-                    print "add filter"
+                    #print "add filter"
             pollution = company.pollute()
-            #self.Town.add_pollution(company.location, pollution) #TODO
+            self.Town.add_pollution(pollution, company.location) #TODO
             if (company.is_working):
                 self.Town.add_money_to_fund(company.taxes)
             company.manage()
