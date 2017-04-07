@@ -4,19 +4,20 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import matplotlib.patches as patches
-
+import tkMessageBox
 class Application(Tk.Frame):
     def __init__(self, master = None):
         Tk.Frame.__init__(self, master)
         self.master = master
         
-        
         self.initialize()
-
+        
     def initialize(self):
         self.grid()
         self.createWidgets()
-
+        
+        
+        
         
         
         self.entryVariable1 = Tk.StringVar()
@@ -68,6 +69,7 @@ class Application(Tk.Frame):
                               anchor="w",fg="white",bg="blue")
         label.grid(column=0,row=4,columnspan=2,sticky='EW')
 
+
         self.grid_columnconfigure(0,weight=1)
         #self.resizable(True,False)
         self.update()
@@ -94,10 +96,10 @@ class Application(Tk.Frame):
             self.labelVariable.set("You need to enter every value")
             return
         self.manager = Manager(int(n1), int(n2), int(n3))
-        for i in range(250):
+        for i in range(25):
             self.manager.main()
             if (i == 0):
-                im = self.ax.imshow(f(self.x, self.y, self.manager.Town.Companies), cmap='YlOrRd', vmin = 0, vmax = 100000, animated=False)#TODO
+                im = self.ax.imshow(f(self.x, self.y, self.manager.Town.Companies), cmap='YlOrRd', vmin = 5000, vmax = 100000, animated=False)#TODO
                 for company in self.manager.Town.Companies:
                     x, y = company.location
                     size = company.size
@@ -111,10 +113,55 @@ class Application(Tk.Frame):
                     ))
             else:
                 im.set_array(f(self.x, self.y, self.manager.Town.Companies))
+            
             self.canvas.draw()
+            #new = Tk.Toplevel()
+            Control = Control_data(self)
+            #new.destoy()
+            #Control.mainloop()
+            
+            #new = enter_control_data()
+            
+            self.master.wait_window(Control.top)
+            #self.stop()
+            #self.master.after(1000, self.scanning())
+            
         #self.entry1.focus_set()#TODO ???
         #self.entry1.selection_range(0, Tk.END)#TODO ???
 
+
+class Control_data(Tk.Frame): 
+    def __init__(self, master = None):
+        top = self.top = Tk.Toplevel(master)
+
+        Tk.Label(top, text="Value").pack()
+        self.initialize()
+        '''self.e = Tk.Entry(top)
+        self.e.pack(padx=5)
+
+        b = Tk.Button(top, text="OK", command=self.OnButtonClick)
+        b.pack(pady=5) '''
+
+    def OnButtonClick(self):
+        
+        print "value is", self.entry_controlVariable.get()
+
+        self.top.destroy()
+    def initialize(self):
+        #self.grid()
+        self.entry_controlVariable = Tk.StringVar()
+        self.entry_control = Tk.Entry(self.top, textvariable=self.entry_controlVariable)
+        self.entry_control.pack(padx=5)
+        #self.entry_control.grid(column=1,row=0,sticky='EW')
+        
+        self.button_control = Tk.Button(self.top, text = "OK", command = self.OnButtonClick)
+        self.button_control.pack(pady=5)
+        #self.button_control.grid(column=0,row=1)
+        self.label_control = Tk.Label(self.top, text = "Enter new number to multiply" )
+        self.label_control.pack(pady=10)
+        #self.label_control.grid(column=0,row=0,columnspan=1,sticky='EW')
+        #self.entry_control.focus_force()#impolite
+        #return new
 def f(x, y, Companies):
     poll = np.zeros((len(x), len(y)))
     for company in Companies:
@@ -122,5 +169,6 @@ def f(x, y, Companies):
         s = company.size
         c1 += s/4
         c2 += s/4
-        poll += company.made_pollution/((x-c1)*(x-c1) + (y-c2)*(y-c2))#TODO devision by zero
+        poll += 10000 * company.made_pollution/((x-c1)*(x-c1) + (y-c2)*(y-c2))#TODO devision by zero
     return poll
+
