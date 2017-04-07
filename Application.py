@@ -98,7 +98,7 @@ class Application(Tk.Frame):
             self.master.wait_window(Control.top)
             self.manager.main()
             if (i == 0):
-                im = self.ax.imshow(f(self.x, self.y, self.manager.Town.Companies), cmap='YlOrRd', vmin = 25000, vmax = 500000, animated=False)#TODO
+                im = self.ax.imshow(f(self.x, self.y, self.manager.Town.Companies, self.manager.Town.Pollution), cmap='YlOrRd', vmin = 25000, vmax = 500000, animated=False)#TODO
                 for company in self.manager.Town.Companies:
                     x, y = company.location
                     size = company.size
@@ -111,7 +111,7 @@ class Application(Tk.Frame):
                         fill=False
                     ))
             else:
-                im.set_array(f(self.x, self.y, self.manager.Town.Companies))
+                im.set_array(f(self.x, self.y, self.manager.Town.Companies, self.manager.Town.Pollution))
             
             self.canvas.draw()
             
@@ -193,13 +193,15 @@ class Control_data(Tk.Frame):
         self.entry_control[s].grid(column = e_c, row = i_r)'''
                 
         
-def f(x, y, Companies):
+def f(x, y, Companies, car_pollution):
     poll = np.zeros((len(x), len(y)))
+    constant = 1000000
+    poll += constant * car_pollution / 10
     for company in Companies:
         c1, c2 = company.location
         s = company.size
         c1 += s/4
         c2 += s/4
-        poll += 1000000 * company.made_pollution/((x-c1)*(x-c1) + (y-c2)*(y-c2))#TODO devision by zero
+        poll += constant * company.made_pollution/((x-c1)*(x-c1) + (y-c2)*(y-c2))#TODO devision by zero
     return poll
 

@@ -5,8 +5,8 @@ class Town:
         self.Area = Area
         self.Cars = Cars
         self.Pollution = 0
-        self.c1=25
-        self.c2=25
+        self.c1=25#TODO
+        self.c2=25#TODO
     
     def add_car_pollution(self):
         self.Pollution += self.Cars.percent * (self.Cars.amount_()) * (self.Cars.pollution_())

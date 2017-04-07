@@ -42,9 +42,10 @@ class Manager:
                     company.add_filter()
                     print "add filter"
             pollution = company.pollute()
-            self.Town.add_pollution(company.location, pollution) #TODO
+            #self.Town.add_pollution(company.location, pollution) #TODO
             if (company.is_working):
                 self.Town.add_money_to_fund(company.taxes)
+            company.manage()
             #company.reset_pollution()#TODO why?
         self.Weather = random.randint(0, 5)
         if (self.Weather > 0):
