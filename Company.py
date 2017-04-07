@@ -1,6 +1,7 @@
 import random
 class Company:
-    def __init__(self, location, size, taxes, allowed_pollution): 
+    def __init__(self, name, location, size, taxes, allowed_pollution):
+        self.name = name 
         self.location = location
         self.size = size
         self.taxes = taxes
@@ -10,9 +11,11 @@ class Company:
         self.filters = 0
     def stop_working(self):
         self.is_working = False
+    def resume_working(self):
+        self.is_working = True
     def pollute(self):
         if (self.is_working):
-            pollution = random.randint(1, 5000)
+            pollution = random.randint(1, 5)
             if (self.filters > 0):
                 pollution /= self.filters
             self.made_pollution += pollution

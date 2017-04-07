@@ -16,10 +16,6 @@ class Application(Tk.Frame):
         self.grid()
         self.createWidgets()
         
-        
-        
-        
-        
         self.entryVariable1 = Tk.StringVar()
         self.entry1 = Tk.Entry(self, textvariable=self.entryVariable1)
         self.entry1.grid(column=1,row=0,sticky='EW')
@@ -97,9 +93,12 @@ class Application(Tk.Frame):
             return
         self.manager = Manager(int(n1), int(n2), int(n3))
         for i in range(25):
+            
+            Control = Control_data(self)
+            self.master.wait_window(Control.top)
             self.manager.main()
             if (i == 0):
-                im = self.ax.imshow(f(self.x, self.y, self.manager.Town.Companies), cmap='YlOrRd', vmin = 5000, vmax = 100000, animated=False)#TODO
+                im = self.ax.imshow(f(self.x, self.y, self.manager.Town.Companies), cmap='YlOrRd', vmin = 25000, vmax = 500000, animated=False)#TODO
                 for company in self.manager.Town.Companies:
                     x, y = company.location
                     size = company.size
@@ -115,14 +114,8 @@ class Application(Tk.Frame):
                 im.set_array(f(self.x, self.y, self.manager.Town.Companies))
             
             self.canvas.draw()
-            #new = Tk.Toplevel()
-            Control = Control_data(self)
-            #new.destoy()
-            #Control.mainloop()
             
-            #new = enter_control_data()
             
-            self.master.wait_window(Control.top)
             #self.stop()
             #self.master.after(1000, self.scanning())
             
@@ -132,36 +125,74 @@ class Application(Tk.Frame):
 
 class Control_data(Tk.Frame): 
     def __init__(self, master = None):
-        top = self.top = Tk.Toplevel(master)
-
-        Tk.Label(top, text="Value").pack()
+        self.top = Tk.Toplevel(master)
+        self.master= master
+        #Tk.Label(top, text="Value").pack()
         self.initialize()
-        '''self.e = Tk.Entry(top)
-        self.e.pack(padx=5)
-
-        b = Tk.Button(top, text="OK", command=self.OnButtonClick)
-        b.pack(pady=5) '''
 
     def OnButtonClick(self):
-        
-        print "value is", self.entry_controlVariable.get()
-
+        Companies = self.master.manager.Town.Companies
+        for company in Companies:
+            name = company.name
+            for i in ["filters", "stop working"]:
+                name_i = name+i
+                if name_i not in self.master.manager.smth:   
+                    self.master.manager.smth[name_i] = 0
+        if ('spec.mode' not in self.master.manager.smth):
+            self.master.manager.smth['spec.mode'] = 1
         self.top.destroy()
+        
     def initialize(self):
         #self.grid()
-        self.entry_controlVariable = Tk.StringVar()
-        self.entry_control = Tk.Entry(self.top, textvariable=self.entry_controlVariable)
-        self.entry_control.pack(padx=5)
-        #self.entry_control.grid(column=1,row=0,sticky='EW')
+        self.top.grid()
+        
+        self.make_entries()
+    def make_entries(self):
+        self.entry_controlVariable = dict()
+        self.entry_control = dict()
+        self.label_control = dict()
+        self.create_fields("spec.mode", "special mode", 0, 1, 0)
+        name_row = 1
+        Companies = self.master.manager.Town.Companies
+        for company in Companies:
+            name = company.name
+            name_column = 0
+            
+            self.label_control[name] = Tk.Label(self.top, text = name )
+            self.label_control[name].grid(column=name_column,row=name_row, columnspan = 2)
+            i_row = name_row
+            self.master.manager.smth[name+"filters"] = 0
+            for i in ["filters", "stop working"]:
+                
+                l_column = 0
+                e_column = 1
+                i_row = i_row + 1
+                self.create_fields(name+i, i, l_column, e_column, i_row)
+            name_row += 3
         
         self.button_control = Tk.Button(self.top, text = "OK", command = self.OnButtonClick)
-        self.button_control.pack(pady=5)
-        #self.button_control.grid(column=0,row=1)
-        self.label_control = Tk.Label(self.top, text = "Enter new number to multiply" )
-        self.label_control.pack(pady=10)
-        #self.label_control.grid(column=0,row=0,columnspan=1,sticky='EW')
-        #self.entry_control.focus_force()#impolite
-        #return new
+        self.button_control.grid(column = 0, row = name_row+3, columnspan = 2)
+
+    def create_fields(self, s, i, l_c, e_c, i_r):
+        self.label_control[s] = Tk.Label(self.top, text = i )
+        self.label_control[s].grid(column = l_c, row = i_r) 
+        self.entry_control[s] = Tk.Button(self.top, text='Yes', command = lambda: self.YesButton(s))
+        self.entry_control[s].grid(column = e_c, row = i_r)
+        self.entry_control[s] = Tk.Button(self.top, text='No', command = lambda: self.NoButton(s))
+        self.entry_control[s].grid(column = e_c + 1, row = i_r)
+
+    def YesButton(self, name):
+        self.master.manager.smth[name] = 1
+    def NoButton(self, name):
+        self.master.manager.smth[name] = 0
+    '''def create_fields(self, s, i, l_c, e_c, i_r):
+        self.label_control[s] = Tk.Label(self.top, text = i )
+        self.label_control[s].grid(column = l_c, row = i_r) 
+        self.entry_controlVariable[s] = Tk.StringVar()       
+        self.entry_control[s] = Tk.Entry(self.top, textvariable=self.entry_controlVariable[s])
+        self.entry_control[s].grid(column = e_c, row = i_r)'''
+                
+        
 def f(x, y, Companies):
     poll = np.zeros((len(x), len(y)))
     for company in Companies:
@@ -169,6 +200,6 @@ def f(x, y, Companies):
         s = company.size
         c1 += s/4
         c2 += s/4
-        poll += 10000 * company.made_pollution/((x-c1)*(x-c1) + (y-c2)*(y-c2))#TODO devision by zero
+        poll += 1000000 * company.made_pollution/((x-c1)*(x-c1) + (y-c2)*(y-c2))#TODO devision by zero
     return poll
 
