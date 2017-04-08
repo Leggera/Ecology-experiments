@@ -3,11 +3,11 @@ from Company import *
 from Cars import *
 
 class Manager:
-    def __init__(self, Car_pollution, K, Fund, filter_cost, fee, critical_pollution):
+    def __init__(self, Car_pollution, K, Fund, filter_cost, fee, critical_pollution, Weather):
         Companies, Area = self.read_interface()
         Cars_ = Cars(K, Car_pollution)
         self.Town = Town(Fund, filter_cost, fee, critical_pollution, Companies, Area, Cars_)
-        self.Weather = 0
+        self.Weather = Weather
         self.smth = dict()
     def read_interface(self):
         Companies = []
@@ -45,6 +45,6 @@ class Manager:
             if (company.is_working):
                 self.Town.add_money_to_fund(company.taxes)
             company.manage()
-        self.Weather = random.randint(0, 5000)#TODO
-        if (self.Weather > 0):
-            self.Town.reduce_pollution(self.Weather)
+        Weather = random.randint(0, self.Weather)#TODO
+        if (Weather > 0):
+            self.Town.reduce_pollution(Weather)

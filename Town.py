@@ -6,6 +6,7 @@ class Town:
         self.Area = Area
         self.Cars = Cars
         self.Pollution = np.array([0.0, 0.0, 0.0])
+        self.residual_pollution = 0
         self.points= [(25, 25), (20, 80), (50, 20)]#TODO
         self.filter_cost = filter_cost
         self.fee = fee
@@ -40,8 +41,12 @@ class Town:
                 count += 1
         else:
             self.Pollution+=pollution
+            self.residual_pollution += pollution
     def reduce_pollution(self, pollution):
         self.Pollution-=pollution
-        for i,pol in enumerate(self.Pollution):
+        for i, pol in enumerate(self.Pollution):
             if (pol < 0):
                 self.Pollution[i] = 0
+        self.residual_pollution -= pollution
+        if (self.residual_pollution < 0):
+            self.residual_pollution = 0

@@ -11,4 +11,6 @@ class Cars:
     def pollute(self):
         pollution = self.percent * self.amount * self.pollution
         self.made_pollution += pollution
+        print pollution
+        print "!!"
         return pollution

@@ -76,6 +76,16 @@ class Application(Tk.Frame):
         label6.grid(column=0,row=5,columnspan=1 ,sticky='EW')
         self.labelVariable6.set( "critical pollution")
 
+        self.entryVariable7 = Tk.StringVar()
+        self.entry7 = Tk.Entry(self,textvariable=self.entryVariable7)
+        self.entry7.grid(column=1,row=6,sticky='EW')
+
+        self.labelVariable7 = Tk.StringVar()
+        label7 = Tk.Label(self,textvariable=self.labelVariable7,
+                              anchor="w",fg="black",bg="yellow")
+        label7.grid(column=0,row=6,columnspan=1 ,sticky='EW')
+        self.labelVariable7.set( "wind power")
+
 
         self.entry1.bind("<Return>", self.OnPressEnter)
         self.entry2.bind("<Return>", self.OnPressEnter)
@@ -83,11 +93,12 @@ class Application(Tk.Frame):
         self.entry4.bind("<Return>", self.OnPressEnter)
         self.entry5.bind("<Return>", self.OnPressEnter)
         self.entry6.bind("<Return>", self.OnPressEnter)
+        self.entry7.bind("<Return>", self.OnPressEnter)
         
         self.labelVariable = Tk.StringVar()
         label = Tk.Label(self,textvariable=self.labelVariable,
                               anchor="w",fg="white",bg="blue")
-        label.grid(column=0,row=6,columnspan=2,sticky='EW')
+        label.grid(column=0,row=7,columnspan=2,sticky='EW')
 
 
         self.grid_columnconfigure(0,weight=1)
@@ -113,10 +124,12 @@ class Application(Tk.Frame):
         n4 = self.entryVariable4.get()
         n5 = self.entryVariable5.get()
         n6 = self.entryVariable6.get()
-        if (n1 == '') or (n2 == '') or (n3 == '') or (n4 == '') or (n5 == '') or (n6 == ''):
+        n7 = self.entryVariable7.get()
+
+        if (n1 == '') or (n2 == '') or (n3 == '') or (n4 == '') or (n5 == '') or (n6 == '') or (n7 == ''):
             self.labelVariable.set("You need to enter every value")
             return
-        self.manager = Manager(int(n1), int(n2), int(n3), int(n4), int(n5), int(n6))#TODO
+        self.manager = Manager(int(n1), int(n2), int(n3), int(n4), int(n5), int(n6), int(n7))#TODO
         text = dict()
         percent = dict()
         pollution = dict()
@@ -130,7 +143,7 @@ class Application(Tk.Frame):
                 man = self.manager
                 self.x = np.linspace(0, int(man.Town.Area[0]), 100)
                 self.y = np.linspace(0, int(man.Town.Area[1]), 100).reshape(-1, 1)
-                im = self.ax.imshow(f(self.x, self.y, man.Town.Companies, man.Town.Cars.made_pollution - man.Weather), cmap='YlOrRd', vmin = 25000, vmax = 500000, animated=False)
+                im = self.ax.imshow(f(self.x, self.y, man.Town.Companies, man.Town.residual_pollution), cmap='YlOrRd', vmin = 0, vmax = 10, animated=False)
                 for company in self.manager.Town.Companies:
                     x, y = company.location
                     size = company.size
@@ -154,7 +167,7 @@ class Application(Tk.Frame):
                     count += 1
                 
             else:
-                im.set_array(f(self.x, self.y, self.manager.Town.Companies, self.manager.Town.Cars.made_pollution - man.Weather))
+                im.set_array(f(self.x, self.y, self.manager.Town.Companies, self.manager.Town.residual_pollution))
                 for company in self.manager.Town.Companies:
                     text[company].set_text("filters: %d" %(company.filters))
                     percent[company].set_text("%" + "%d" %(round(company.day_count * (100.0/7))))
@@ -238,13 +251,13 @@ class Control_data(Tk.Frame):
         
 def f(x, y, Companies, car_pollution):
     poll = np.zeros((len(x), len(y)))
-    constant = 1000#TODO
+    #constant = 1000#TODO
     poll += car_pollution
     for company in Companies:
         c1, c2 = company.location
         s = company.size
         c1 += s/4
         c2 += s/4
-        poll += constant * company.made_pollution/((x-c1)*(x-c1) + (y-c2)*(y-c2))#TODO devision by zero
+        poll += company.made_pollution/((x-c1)*(x-c1) + (y-c2)*(y-c2))#TODO devision by zero
     return poll
 

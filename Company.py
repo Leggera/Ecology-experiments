@@ -22,6 +22,7 @@ class Company:
             if (self.filters > 0):
                 pollution -= 0.07 * self.filters * pollution
             self.made_pollution += pollution
+            print self.made_pollution
             self.daily_pollution = pollution
             #Town.add_pollution(pollution)?
             return pollution
