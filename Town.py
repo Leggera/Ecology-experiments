@@ -1,14 +1,16 @@
+import numpy as np
 class Town:
-    def __init__(self, Fund, Companies, Area, Cars):
+    def __init__(self, Fund, filter_cost, fee, critical_pollution, Companies, Area, Cars):
         self.Fund = Fund
         self.Companies = Companies
         self.Area = Area
         self.Cars = Cars
-        self.Pollution = 0
-        self.c1=25#TODO
-        self.c2=25#TODO
-    
-    
+        self.Pollution = np.array([0.0, 0.0, 0.0])
+        self.points= [(25, 25), (20, 80), (50, 20)]#TODO
+        self.filter_cost = filter_cost
+        self.fee = fee
+        self.critical_pollution = critical_pollution    
+
     def add_money_to_fund(self, money):
         self.Fund += money
     def get_money_from_fund(self, money):
@@ -18,23 +20,28 @@ class Town:
         else:
             return False
     def penalty_company(self, company):
-        some_amount = 100#TODO
-        if  (company.made_pollution > company.allowed_pollution):
-            if (company.made_pollution > some_amount):
+        if  (company.daily_pollution > company.allowed_pollution):
+            if (company.daily_pollution > self.critical_pollution):
                 company.stop_working()
                 print "Stop working"
             else:
-                self.add_money_to_fund(100)#TODO not taxes
+                self.add_money_to_fund(self.fee)
     def reduce_cars(self, amount):
         self.Cars.percent *= amount
     def measure_pollution(self):
-        return self.Pollution#???TODO
+        return self.Pollution
     def add_pollution(self, pollution, location = None):
-        if (location):
+        if (location is not None):
             x, y = location
-            self.Pollution+=float(pollution)/((x-self.c1)*(x-self.c1) + (y-self.c2)*(y-self.c2))
-        self.Pollution+=pollution
+            count = 0
+            for point in self.points:
+                c1, c2 = point
+                self.Pollution[count]+=float(pollution)/((x-c1)*(x-c1) + (y-c2)*(y-c2))
+                count += 1
+        else:
+            self.Pollution+=pollution
     def reduce_pollution(self, pollution):
         self.Pollution-=pollution
-        if (self.Pollution < 0):
-            self.Pollution = 0
+        for i,pol in enumerate(self.Pollution):
+            if (pol < 0):
+                self.Pollution[i] = 0
